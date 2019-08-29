@@ -1,0 +1,558 @@
+Enter password: ****
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 2
+Server version: 5.5.61 MySQL Community Server (GPL)
+
+Copyright (c) 2000, 2018, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> create database vinrho;
+Query OK, 1 row affected (0.00 sec)
+
+mysql> drop vinrho;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'vinrho' at line 1
+mysql> drop database vinrho;
+Query OK, 0 rows affected (0.05 sec)
+
+mysql> create database vinroh;
+Query OK, 1 row affected (0.00 sec)
+
+mysql> CREATE TABLE Location
+    -> (
+    ->   LocID int primary key,
+    ->   City varchar(10) not null,
+    ->   Addr varchar(20)
+    -> );
+ERROR 1046 (3D000): No database selected
+mysql> use vinroh;
+Database changed
+mysql> CREATE TABLE Location
+    -> (
+    ->   LocID int primary key,
+    ->   City varchar(10) not null,
+    ->   Addr varchar(20)
+    -> );
+Query OK, 0 rows affected (0.12 sec)
+
+mysql>
+mysql> INSERT INTO Location VALUES
+    -> (1, 'Mumbai', 'MBP'),
+    -> (2, 'Bangalore', 'ITPL'),
+    -> (3, 'Pune', 'Hinje Wadi'),
+    -> (4, 'Gurgaon', 'DLF 2');
+Query OK, 4 rows affected (0.13 sec)
+Records: 4  Duplicates: 0  Warnings: 0
+
+mysql>
+mysql> INSERT INTO Location VALUES
+    -> (5, 'Hydrabad', 'Hitech City');
+Query OK, 1 row affected (0.03 sec)
+
+mysql> show tables;
++------------------+
+| Tables_in_vinroh |
++------------------+
+| location         |
++------------------+
+1 row in set (0.00 sec)
+
+mysql> CREATE TABLE Dept
+    -> (DeptID int primary key,
+    ->  DName varchar(10) not null,
+    ->  LocID int references Location(LocID)
+    -> );
+Query OK, 0 rows affected (0.06 sec)
+
+mysql> INSERT INTO Dept VALUEs
+    -> (101, 'Sales', 1),
+    -> (102, 'HR', 3),
+    -> (103, 'Finance', 2),
+    -> (104, 'MKTG', 3),
+    -> (105, 'OPS', 4),
+    -> (106, 'IT', 4);
+Query OK, 6 rows affected (0.03 sec)
+Records: 6  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO Dept VALUES
+    -> (107, 'Trvl Desk', NULL);
+Query OK, 1 row affected (0.02 sec)
+
+mysql> show tables;
++------------------+
+| Tables_in_vinroh |
++------------------+
+| dept             |
+| location         |
++------------------+
+2 rows in set (0.00 sec)
+
+mysql> select * from dept;
++--------+-----------+-------+
+| DeptID | DName     | LocID |
++--------+-----------+-------+
+|    101 | Sales     |     1 |
+|    102 | HR        |     3 |
+|    103 | Finance   |     2 |
+|    104 | MKTG      |     3 |
+|    105 | OPS       |     4 |
+|    106 | IT        |     4 |
+|    107 | Trvl Desk |  NULL |
++--------+-----------+-------+
+7 rows in set (0.00 sec)
+
+mysql> select * from location;
++-------+-----------+-------------+
+| LocID | City      | Addr        |
++-------+-----------+-------------+
+|     1 | Mumbai    | MBP         |
+|     2 | Bangalore | ITPL        |
+|     3 | Pune      | Hinje Wadi  |
+|     4 | Gurgaon   | DLF 2       |
+|     5 | Hydrabad  | Hitech City |
++-------+-----------+-------------+
+5 rows in set (0.00 sec)
+
+mysql> INSERT INTO Dept VALUES
+    -> (107, 'Trvl Desk', NULL);
+ERROR 1062 (23000): Duplicate entry '107' for key 'PRIMARY'
+mysql> select dname,city,addr
+    -> from dept inner join location on dept.locid=location.locid;
++---------+-----------+------------+
+| dname   | city      | addr       |
++---------+-----------+------------+
+| Sales   | Mumbai    | MBP        |
+| Finance | Bangalore | ITPL       |
+| HR      | Pune      | Hinje Wadi |
+| MKTG    | Pune      | Hinje Wadi |
+| OPS     | Gurgaon   | DLF 2      |
+| IT      | Gurgaon   | DLF 2      |
++---------+-----------+------------+
+6 rows in set (0.00 sec)
+
+mysql> select dname,city,addr
+    -> from dept left outer join location
+    -> on dept loc.id=location loc.id;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'loc.id=location loc.id' at line 3
+mysql> on dept location.id=location loc.id;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'on dept location.id=location loc.id' at line 1
+mysql> select dname,city,addr
+    -> from dept left outer join location
+    -> on dept.locid= location.locid;
++-----------+-----------+------------+
+| dname     | city      | addr       |
++-----------+-----------+------------+
+| Sales     | Mumbai    | MBP        |
+| HR        | Pune      | Hinje Wadi |
+| Finance   | Bangalore | ITPL       |
+| MKTG      | Pune      | Hinje Wadi |
+| OPS       | Gurgaon   | DLF 2      |
+| IT        | Gurgaon   | DLF 2      |
+| Trvl Desk | NULL      | NULL       |
++-----------+-----------+------------+
+7 rows in set (0.00 sec)
+
+mysql> select dname,city,addr
+    -> from dept right outer join location
+    -> on dept.locid= location.locid;
++---------+-----------+-------------+
+| dname   | city      | addr        |
++---------+-----------+-------------+
+| Sales   | Mumbai    | MBP         |
+| Finance | Bangalore | ITPL        |
+| HR      | Pune      | Hinje Wadi  |
+| MKTG    | Pune      | Hinje Wadi  |
+| OPS     | Gurgaon   | DLF 2       |
+| IT      | Gurgaon   | DLF 2       |
+| NULL    | Hydrabad  | Hitech City |
++---------+-----------+-------------+
+7 rows in set (0.00 sec)
+
+mysql>
+mysql>
+mysql> create table emp(empid int primary key,)
+    -> fname varchar(10) not null,
+    -> lname varchar(10) not null,
+    -> deptid int references dept(deptid),
+    -> merld int references emp(empid),
+    -> salary decimal(10,2)
+    -> ;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ')
+fname varchar(10) not null,
+lname varchar(10) not null,
+deptid int references ' at line 1
+mysql> create table emp(empid int primary key,
+    -> fname varchar(10) not null,
+    -> lname varchar(10) not null,
+    -> deptid int references dept(deptid),
+    -> mgrld int references emp(empid),
+    -> salary decimal(10,2)
+    -> );
+Query OK, 0 rows affected (0.08 sec)
+
+mysql> insert into emp values
+    -> (1001,'steven','king',105,null,50000),
+    -> (1003,'nancy','raut',102,1001,350000),
+    -> (1002,'radhika','masale',105,1003,40000);
+Query OK, 3 rows affected (0.06 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> insert into emp values(1004,'andrew','lusk',101,1002,15000);
+Query OK, 1 row affected (0.06 sec)
+
+mysql> insert into emp values(1006,'andy','hillman',105,1001,30000);
+Query OK, 1 row affected (0.19 sec)
+
+mysql>
+mysql> INSERT INTO Emp VALUES
+    -> (1005, 'Pamela', 'Davis', NULL, 1002, 14000),
+    -> (1007, 'Rene', 'Lopez', 105, 1001, 18000),
+    -> (1009, 'Sue', 'Fisher', 105, 1001, 11000),
+    -> (1008, 'Tanya', 'Rff', 105, 1001, 10000);
+Query OK, 4 rows affected (0.13 sec)
+Records: 4  Duplicates: 0  Warnings: 0
+
+mysql> SELECT *
+    ->   FROM Location;
++-------+-----------+-------------+
+| LocID | City      | Addr        |
++-------+-----------+-------------+
+|     1 | Mumbai    | MBP         |
+|     2 | Bangalore | ITPL        |
+|     3 | Pune      | Hinje Wadi  |
+|     4 | Gurgaon   | DLF 2       |
+|     5 | Hydrabad  | Hitech City |
++-------+-----------+-------------+
+5 rows in set (0.00 sec)
+
+mysql> SELECT DName, City, Addr
+    ->   FROM Dept RIGHT OUTER JOIN
+    ->        Location
+    ->     ON Dept.LocID = Location.LocID
+    ->   WHERE DName IS NULL;
++-------+----------+-------------+
+| DName | City     | Addr        |
++-------+----------+-------------+
+| NULL  | Hydrabad | Hitech City |
++-------+----------+-------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT DName, City, Addr
+    ->   FROM Dept LEFT OUTER JOIN
+    ->        Location
+    ->     ON Dept.LocID = Location.LocID
+    ->   WHERE City IS NULL;
++-----------+------+------+
+| DName     | City | Addr |
++-----------+------+------+
+| Trvl Desk | NULL | NULL |
++-----------+------+------+
+1 row in set (0.00 sec)
+
+mysql> SELECT DName, City, Addr
+    ->   FROM Dept INNER JOIN
+    ->        Location
+    ->     ON Dept.LocID = Location.LocID
+    ->   WHERE City = 'Gurgaon';
++-------+---------+-------+
+| DName | City    | Addr  |
++-------+---------+-------+
+| OPS   | Gurgaon | DLF 2 |
+| IT    | Gurgaon | DLF 2 |
++-------+---------+-------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT DName, City, Addr
+    ->   FROM Dept LEFT OUTER JOIN
+    ->        Location
+    ->     ON Dept.LocID = Location.LocID
+    ->   WHERE City IS NULL;
++-----------+------+------+
+| DName     | City | Addr |
++-----------+------+------+
+| Trvl Desk | NULL | NULL |
++-----------+------+------+
+1 row in set (0.00 sec)
+
+mysql>
+mysql> SELECT DName,
+    ->        CONCAT(FName, ' ', LName) AS Name,
+    ->        City, Addr
+    ->   FROM Dept INNER JOIN Location
+    ->     ON Dept.LocID = Location.LocID
+    ->     INNER JOIN Emp
+    ->     ON Dept.DeptID = Emp.DeptID;
++-------+----------------+---------+------------+
+| DName | Name           | City    | Addr       |
++-------+----------------+---------+------------+
+| Sales | andrew lusk    | Mumbai  | MBP        |
+| HR    | nancy raut     | Pune    | Hinje Wadi |
+| OPS   | steven king    | Gurgaon | DLF 2      |
+| OPS   | radhika masale | Gurgaon | DLF 2      |
+| OPS   | andy hillman   | Gurgaon | DLF 2      |
+| OPS   | Rene Lopez     | Gurgaon | DLF 2      |
+| OPS   | Tanya Rff      | Gurgaon | DLF 2      |
+| OPS   | Sue Fisher     | Gurgaon | DLF 2      |
++-------+----------------+---------+------------+
+8 rows in set (0.01 sec)
+
+mysql> SELECT d.DName,
+    ->        CONCAT(e.FName, ' ', e.LName) AS Name,
+    ->        l.City, l.Addr
+    ->   FROM Dept d INNER JOIN Location l
+    ->     ON d.LocID = l.LocID
+    ->     INNER JOIN Emp e
+    ->     ON d.DeptID = e.DeptID;
++-------+----------------+---------+------------+
+| DName | Name           | City    | Addr       |
++-------+----------------+---------+------------+
+| Sales | andrew lusk    | Mumbai  | MBP        |
+| HR    | nancy raut     | Pune    | Hinje Wadi |
+| OPS   | steven king    | Gurgaon | DLF 2      |
+| OPS   | radhika masale | Gurgaon | DLF 2      |
+| OPS   | andy hillman   | Gurgaon | DLF 2      |
+| OPS   | Rene Lopez     | Gurgaon | DLF 2      |
+| OPS   | Tanya Rff      | Gurgaon | DLF 2      |
+| OPS   | Sue Fisher     | Gurgaon | DLF 2      |
++-------+----------------+---------+------------+
+8 rows in set (0.00 sec)
+
+mysql> INSERT INTO Emp VALUES
+    -> (1005, 'Pamela', 'Davis', NULL, 1002);
+ERROR 1136 (21S01): Column count doesn't match value count at row 1
+mysql> SELECT d.DName,
+    ->   CONCAT(e.FName, ' ', e.LName) AS EmpName
+    ->   FROM Dept d RIGHT OUTER JOIN Emp e
+    ->     ON d.DeptID = e.DeptID;
++-------+----------------+
+| DName | EmpName        |
++-------+----------------+
+| OPS   | steven king    |
+| OPS   | radhika masale |
+| HR    | nancy raut     |
+| Sales | andrew lusk    |
+| NULL  | Pamela Davis   |
+| OPS   | andy hillman   |
+| OPS   | Rene Lopez     |
+| OPS   | Tanya Rff      |
+| OPS   | Sue Fisher     |
++-------+----------------+
+9 rows in set (0.00 sec)
+
+mysql> SELECT CONCAT(emp.FName, ' ',
+    ->               emp.LName) AS EmpName,
+    -> CONCAT(mgr.FName, ' ',
+    ->               mgr.LName) AS MgrNAme
+    ->   FROM Emp emp INNER JOIN Emp mgr
+    ->     ON emp.MgrID = mgr.EmpID;
+ERROR 1054 (42S22): Unknown column 'emp.MgrID' in 'on clause'
+mysql> SELECT CONCAT(emp.FName, ' ',
+    ->               emp.LName) AS EmpName,
+    -> CONCAT(mgr.FName, ' ',
+    ->               mgr.LName) AS MgrNAme
+    ->   FROM Emp emp INNER JOIN Emp mgr
+    ->               emp.LName) AS EmpName,;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'emp.LName) AS EmpName,' at line 6
+mysql> SELECT CONCAT(emp.FName, ' ',
+    ->               emp.LName) AS EmpName,
+    -> CONCAT(mgr.FName, ' ',
+    ->               mgr.LName) AS MgrNAme
+    ->   FROM Emp emp INNER JOIN Emp mgr
+    ->     ON emp.MgrlD = mgr.EmpID;
++----------------+----------------+
+| EmpName        | MgrNAme        |
++----------------+----------------+
+| radhika masale | nancy raut     |
+| nancy raut     | steven king    |
+| andrew lusk    | radhika masale |
+| Pamela Davis   | radhika masale |
+| andy hillman   | steven king    |
+| Rene Lopez     | steven king    |
+| Tanya Rff      | steven king    |
+| Sue Fisher     | steven king    |
++----------------+----------------+
+8 rows in set (0.00 sec)
+
+mysql>
+mysql> SELECT CONCAT(emp.FName, ' ',
+    ->               emp.LName) AS EmpName,
+    -> CONCAT(mgr.FName, ' ',
+    ->               mgr.LName) AS MgrNAme
+    ->   FROM Emp emp LEFT OUTER JOIN Emp mgr
+    ->     ON emp.MgrID = mgr.EmpID;
+ERROR 1054 (42S22): Unknown column 'emp.MgrID' in 'on clause'
+mysql> SELECT CONCAT(emp.FName, ' ',
+    ->               emp.LName) AS EmpName,
+    -> CONCAT(mgr.FName, ' ',
+    ->               mgr.LName) AS MgrNAme
+    ->   FROM Emp emp LEFT OUTER JOIN Emp mgr
+    ->     ON emp.MgrlD = mgr.EmpID;
++----------------+----------------+
+| EmpName        | MgrNAme        |
++----------------+----------------+
+| steven king    | NULL           |
+| radhika masale | nancy raut     |
+| nancy raut     | steven king    |
+| andrew lusk    | radhika masale |
+| Pamela Davis   | radhika masale |
+| andy hillman   | steven king    |
+| Rene Lopez     | steven king    |
+| Tanya Rff      | steven king    |
+| Sue Fisher     | steven king    |
++----------------+----------------+
+9 rows in set (0.00 sec)
+
+mysql> SELECT CONCAT(emp.FName, ' ',
+    ->               emp.LName) AS EmpName,
+    -> CONCAT(mgr.FName, ' ',
+    ->               mgr.LName) AS MgrNAme
+    ->   FROM Emp emp LEFT OUTER JOIN Emp mgr
+    ->     ON emp.MgrID = mgr.EmpID
+    -> WHERE emp.MgrlD IS NULL;
+ERROR 1054 (42S22): Unknown column 'emp.MgrID' in 'on clause'
+mysql> SELECT CONCAT(emp.FName, ' ',
+    ->               emp.LName) AS EmpName,
+    -> CONCAT(mgr.FName, ' ',
+    ->               mgr.LName) AS MgrNAme
+    ->   FROM Emp emp LEFT OUTER JOIN Emp mgr
+    ->     ON emp.MgrlD = mgr.EmpID
+    -> WHERE emp.MgrlD IS NULL;
++-------------+---------+
+| EmpName     | MgrNAme |
++-------------+---------+
+| steven king | NULL    |
++-------------+---------+
+1 row in set (0.00 sec)
+
+mysql> select dname,city,addr
+    -> from dept inner join
+    -> location
+    -> on dept.locid = location.locid;
++---------+-----------+------------+
+| dname   | city      | addr       |
++---------+-----------+------------+
+| Sales   | Mumbai    | MBP        |
+| Finance | Bangalore | ITPL       |
+| HR      | Pune      | Hinje Wadi |
+| MKTG    | Pune      | Hinje Wadi |
+| OPS     | Gurgaon   | DLF 2      |
+| IT      | Gurgaon   | DLF 2      |
++---------+-----------+------------+
+6 rows in set (0.00 sec)
+
+mysql> SELECT CONCAT(FName, ' ', LName) AS EmpName
+    ->   FROM Emp
+    ->   WHERE Salary = MAX(Salary);
+ERROR 1111 (HY000): Invalid use of group function
+mysql> SELECT CONCAT(FName, ' ', LName) AS EmpName
+    ->   FROM Emp
+    ->   WHERE Salary = (SELECT MAX(Salary)
+    ->     FROM Emp
+    ->  );
++------------+
+| EmpName    |
++------------+
+| nancy raut |
++------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT CONCAT(FName, ' ', LName) AS EmpName
+    ->   FROM Emp
+    ->   WHERE Salary = (SELECT MAX(Salary)
+    ->     FROM Emp
+    ->                     WHERE Salary <
+    ->                     (
+    ->                       SELECT MAX(Salary)
+    -> FROM Emp
+    ->     )
+    ->  );
++-------------+
+| EmpName     |
++-------------+
+| steven king |
++-------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT CONCAT(FName, ' ', LName) AS EmpName
+    ->   FROM Emp
+    ->   WHERE Salary = (
+    ->    SELECT Salary
+    ->                 FROM Emp
+    ->      ORDER BY Salary DESC
+    ->      LIMIT 1, 1
+    ->   );
++-------------+
+| EmpName     |
++-------------+
+| steven king |
++-------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT CONCAT(FName, ' ', LName) AS EmpName
+    ->                 FROM Emp
+    ->      ORDER BY Salary DESC
+    ->      LIMIT 3, 1;
++--------------+
+| EmpName      |
++--------------+
+| andy hillman |
++--------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT CONCAT(FName, ' ', LName) AS EmpName
+    ->                 FROM Emp
+    ->      ORDER BY Salary DESC
+    ->      LIMIT 3, n;
+ERROR 1327 (42000): Undeclared variable: n
+mysql>
+mysql> SELECT CONCAT(e1.FName, ' ', e1.LName) AS EmpName,
+    -> e1.Salary,
+    ->         COUNT(DISTINCT e2.Salary) AS RowCnt
+    ->   FROM Emp e1 INNER JOIN Emp e2
+    ->     ON e1.Salary <= e2.Salary
+    ->   GROUP BY e1.Salary,
+    ->    CONCAT(e1.FName, ' ', e1.LName)
+    ->   HAVING COUNT(DISTINCT e2.Salary) = 1;
++------------+-----------+--------+
+| EmpName    | Salary    | RowCnt |
++------------+-----------+--------+
+| nancy raut | 350000.00 |      1 |
++------------+-----------+--------+
+1 row in set (0.00 sec)
+
+mysql>
+mysql> SELECT CONCAT(FName, ' ',LName) AS EmpName,
+    -> Salary
+    ->   FROM Emp
+    ->   WHERE Salary > (SELECT AVG(Salary)
+    ->     FROM Emp
+    ->  );
++------------+-----------+
+| EmpName    | Salary    |
++------------+-----------+
+| nancy raut | 350000.00 |
++------------+-----------+
+1 row in set (0.00 sec)
+
+mysql>
+mysql> SELECT CONCAT(FName, ' ',LName) AS EmpName,
+    -> DeptID, Salary
+    ->   FROM Emp main
+    ->   WHERE Salary > (SELECT AVG(Salary)
+    ->     FROM Emp
+    ->     WHERE DeptID = main.DeptID
+    ->  );
++----------------+--------+----------+
+| EmpName        | DeptID | Salary   |
++----------------+--------+----------+
+| steven king    |    105 | 50000.00 |
+| radhika masale |    105 | 40000.00 |
+| andy hillman   |    105 | 30000.00 |
++----------------+--------+----------+
+3 rows in set (0.00 sec)
+
+mysql>
